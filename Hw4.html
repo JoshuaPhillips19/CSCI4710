@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Vampire App</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+
+	<script type="text/javascript">
+
+		var classmate_data = [
+	      {
+	        'name'      : 'John',
+	        'shadow'    : 'no',
+	        'galic'     : 'no',
+	        'complexion': 'pale'
+	      },
+	      {
+	        'name'      : 'Lee',
+	        'shadow'    : 'yes',
+	        'galic'     : 'no',
+	        'complexion': 'pale'
+	      },
+	      {
+	        'name'      : 'Emma',
+	        'shadow'    : 'no',
+	        'galic'     : 'yes',
+	        'complexion': 'brown'
+	      },
+	      {
+	        'name'      : 'Ava',
+	        'shadow'    : 'yes',
+	        'galic'     : 'yes',
+	        'complexion': 'olive'
+	      },
+	      {
+	        'name'      : 'Alex',
+	        'shadow'    : 'no',
+	        'galic'     : 'no',
+	        'complexion': 'brown'
+	      },
+	    ];
+
+    // Load the Visualization API and the corechart package.
+    google.charts.load('current', {'packages':['corechart']});
+
+    // Set a callback to run when the Google Visualization API is loaded.
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+    	var data = new google.visualization.DataTable();
+    	classmate_data_processing(data);
+
+    	// Set chart options
+      var options = {'title':'How many vampires in the class?',
+                     'width':400,
+                     'height':300};
+
+    	// Instantiate and draw our chart, passing in some options.
+      var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+      chart.draw(data, options);
+    }
+
+    function upload_student() {
+      var name = document.getElementById('student_name').value;
+      var shadow;
+      if(document.getElementById('shadow_checkbox').checked) {
+        shadow = 'yes';
+      } else {
+        shadow = 'no';
+      }
+      var garlic;
+      if(document.getElementById('garlic_checkbox').checked) {
+        garlic = 'yes';
+      } else {
+        garlic = 'no';
+      }
+      
+      var complexion = document.getElementById('complexion_dropdown').value;
+      if(complexion == 1) {
+        complexion = 'pale';
+      } else if(complexion == 2) {
+        complexion = 'olive';
+      } else {
+        complexion = 'brown';
+      }
+
+      var new_student = {
+        'name': name,
+        'shadow': shadow,
+        'galic': garlic,
+        'complexion': complexion
+      };
+
+      classmate_data.push(new_student);
+
+      drawChart();
+    }
+
+    function classmate_data_processing(result_data) {
+    	var num_human = 0;
+    	var num_vampire = 0;
+
+      var table = document.getElementById("classmate_table");
+
+      while(table.rows.length > 1) {
+        table.deleteRow(1);
+      }
+
+    	if(document.getElementById('mySelect').value == 1) {
+    		for(var i = 0; i <= classmate_data.length - 1; i++) {
+    			if(Math.floor(Math.random() * 2) == 0) {
+    				var row = table.insertRow(i+1);
+            var name_cell = row.insertCell(0);
+            var shadow_cell = row.insertCell(1);
+            var garlic_cell = row.insertCell(2);
+            var complexion_cell = row.insertCell(3);
+            var vampire_cell = row.insertCell(4);
+            name_cell.innerHTML = classmate_data[i]['name'];
+            shadow_cell.innerHTML = classmate_data[i]['shadow'];
+            garlic_cell.innerHTML = classmate_data[i]['galic'];
+            complexion_cell.innerHTML = classmate_data[i]['complexion'];
+            vampire_cell.innerHTML = 'no';
+            num_human++;
+    			} else {
+    				var row = table.insertRow(i+1);
+            var name_cell = row.insertCell(0);
+            var shadow_cell = row.insertCell(1);
+            var garlic_cell = row.insertCell(2);
+            var complexion_cell = row.insertCell(3);
+            var vampire_cell = row.insertCell(4);
+            name_cell.innerHTML = classmate_data[i]['name'];
+            shadow_cell.innerHTML = classmate_data[i]['shadow'];
+            garlic_cell.innerHTML = classmate_data[i]['galic'];
+            complexion_cell.innerHTML = classmate_data[i]['complexion'];
+            vampire_cell.innerHTML = 'yes';
+            num_vampire++;
+    			}
+    		}
+    	} else {
+    		// Threshold based
+	    	for(var i = 0; i <= classmate_data.length - 1; i++) {
+	    		var curr_score = 0;
+	    		if(classmate_data[i]['shadow'] == 'no') {
+	    			curr_score += 4;
+	    		}
+	    		if(classmate_data[i]['complexion'] == 'pale') {
+	    			curr_score += 3;
+	    		}
+	    		if(classmate_data[i]['galic'] == 'no') {
+	    			curr_score += 3;
+	    		}
+
+          
+
+	    		if(curr_score > 6) {
+            var row = table.insertRow(i+1);
+            var name_cell = row.insertCell(0);
+            var shadow_cell = row.insertCell(1);
+            var garlic_cell = row.insertCell(2);
+            var complexion_cell = row.insertCell(3);
+            var vampire_cell = row.insertCell(4);
+            name_cell.innerHTML = classmate_data[i]['name'];
+            shadow_cell.innerHTML = classmate_data[i]['shadow'];
+            garlic_cell.innerHTML = classmate_data[i]['galic'];
+            complexion_cell.innerHTML = classmate_data[i]['complexion'];
+            vampire_cell.innerHTML = 'yes';
+	    			num_vampire++;
+	    		} else {
+            var row = table.insertRow(i+1);
+            var name_cell = row.insertCell(0);
+            var shadow_cell = row.insertCell(1);
+            var garlic_cell = row.insertCell(2);
+            var complexion_cell = row.insertCell(3);
+            var vampire_cell = row.insertCell(4);
+            name_cell.innerHTML = classmate_data[i]['name'];
+            shadow_cell.innerHTML = classmate_data[i]['shadow'];
+            garlic_cell.innerHTML = classmate_data[i]['galic'];
+            complexion_cell.innerHTML = classmate_data[i]['complexion'];
+            vampire_cell.innerHTML = 'no';
+	    			num_human++;
+	    		}
+	    	}
+    	}
+
+    	// Create the data table.
+      result_data.addColumn('string', 'Element');
+      result_data.addColumn('number', 'Count');
+      result_data.addRows([     
+        ['Human', num_human],
+        ['Vampire', num_vampire]
+      ]);
+
+    }
+	</script>
+</head>
+
+<body>
+
+  <!--Div that will hold the pie chart-->
+  <div id="chart_div"></div>
+
+  <div class="container" style="float:left;">
+  	<h2>Select Method</h2>
+  	<select class="form-control" id="mySelect" style="width:400px;">
+  		<option value = '1'>Random Guess</option>
+  		<option value = '2'>Threshold Based Method</option>
+  	</select>
+
+  	<button class="btn btn-primary" onclick="drawChart()">Confirm</button>
+  </div>
+
+  <div class="container" style="float:left;">
+  	<table class="table table-bordered" id="classmate_table">
+  		<h2>Classmates</h2>
+  		<thead>
+  			<tr>
+  				<th>Classmate</th>
+          <th>Shadow</th>
+          <th>Garlic</th>
+          <th>Complexion</th>
+  				<th>Vampire?</th>
+  			</tr>
+  		</thead>
+  		<tbody id="tbody">
+  		</tbody>
+  	</table>
+  </div>
+
+  <div class="container" style="float:left;">
+  	<h2>Upload Classmate</h2>
+  	<form>
+  		<div class="form-row">
+	  		<div class="form-group col-md-12">
+	  			<label for="name">Name</label>
+	  			<input type="text" class="form-control" id="student_name" name="name" placeholder="Name" style="width:400px;">
+	  		</div>
+	  	</div>
+
+  		<div class="form-row">
+  			<div class="form-group col-md-12">
+  				<div class="checkbox">
+  					<label><input type="checkbox" id="garlic_checkbox">Garlic</label>
+  				</div>
+  				<div class="checkbox">
+  					<label><input type="checkbox" id="shadow_checkbox">Shadow</label>
+  				</div>
+  				<label for="complexion_dropdown">Complexion</label>
+  				<select class="form-control" id="complexion_dropdown" style="width:400px;">
+  					<option value="1">Pale</option>
+  					<option value="2">Olive</option>
+  					<option value="3">Brown</option>
+  				</select>
+  			</div>
+  		</div>
+  	</form>
+  	<button class="btn btn-primary" onclick="upload_student()">Upload</button>
+  </div>
+</body>
+</html>
