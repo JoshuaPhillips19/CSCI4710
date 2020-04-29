@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Blackjack Odds</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <style type="text/css">
+    	body{
+            background-image: url('/static/img/bigstock-poker-table-background.jpg');
+            background-size: cover;
+        }
+
+        .bs-example{
+            margin: 20px;
+        }
+
+        .navbar-custom {
+            background-image: url('/static/img/wood-background.jpg');
+            background-size: 100% 500%;
+        }
+
+        a {
+            color: white;
+            text-shadow: 2px 4px 3px rgba(0,0,0,0.3);
+        }
+
+        a:hover {
+            color: #D3D3D3;
+            text-shadow: 2px 4px 3px rgba(0,0,0,0.3);
+        }
+
+        a.active {
+            color: #A9A9A9;
+            text-shadow: 2px 4px 3px rgba(0,0,0,0.3);
+        }
+
+        .dealer-label, .player-label {
+        	height: 50px;
+        	width: 250px;
+        	border-radius: 5px;
+        	margin: 25px;
+        	background-image: url('/static/img/wood-background.jpg');
+            background-size: 100% 500%;
+        }
+
+        .dealer-card, .player-card {
+        	height: 176px;
+        	width: 124px;
+        	background: white;
+        	margin-left: 88px;
+        	border-radius: 10px
+        }
+
+        .card-box {
+        	height: 176px;
+        	background: none;
+        }
+
+        .action-button-container {
+        	margin-top:100px;
+        }
+
+        .action-button {
+        	display: inline-block;
+        	height: 60px;
+        	width: 250px;
+        	background-image: url('/static/img/wood-background.jpg');
+        	background-size: 100% 500%;
+        	border-radius: 5px;
+        	border: 4px solid black;
+        }
+
+        .result {
+        	height: 500px;
+        	border-radius: 10px;
+        	border: 5px solid black;
+        	background: white;
+        	position: absolute;
+        	top:10%;
+        	left:40%;
+        	right:40%;
+        	z-index: 10;
+        	cursor: pointer;
+        }
+    </style>
+    <script type="text/javascript">
+    	var hand = [];
+    	var dealer_card;
+
+    	function reset_window() {
+    		window.location.href = "odds";
+    	}
+
+    	// helper function
+		function checkRoyalty(card){
+			if(card == "jack" || card == "queen" || card == "king"){
+				return "10";
+			}
+			else if(card == "ace"){
+				return "1"
+			}
+			else{
+				return card;
+			}
+		}
+
+		// two situations where i have two Ace (one=11 one=1)
+		function usersHand(){
+			var sum = 0;
+			var numOfAce = 0;
+			var card;
+			var i;
+			var moreAce = false;
+
+			//check how many aces are in hand
+			for(i = 0; i < hand.length; i++){
+				if(checkAce(hand[i])){
+					numOfAce += 1;
+				}
+			}
+			// if numOfAce is greater than 1, then there exists more than one ace in hand
+			if(numOfAce > 1){
+				moreAce = true;
+			}
+
+			for(i = 0; i < hand.length; i++){
+				card = checkRoyalty(hand[i]);
+				sum += parseInt(card);
+			}
+
+			if(moreAce){
+				sum += 10;
+			}
+
+			if(sum > 21 && moreAce ==true) {
+				sum -= 10;
+			}
+
+			return sum;
+		}
+
+		// helper function
+		function checkAce(card){
+			if(card == "ace"){
+				return true;
+			}
+		}
+
+    	function submit_window() {
+    		var split = false;
+    		var hit = false;
+    		var stand = false;
+    		var bust = false;
+    		var sum = usersHand();
+
+    		if(typeof dealer_card == "undefined"){
+    			document.getElementById('result-text').innerHTML = "DEALER CARD NEEDED";
+    			document.getElementById('result-box').style = "display: block";
+    		} else {
+	    		if(hand.length == 2) {
+	    			if(JSON.stringify(hand) == JSON.stringify(['ace', 'ace'])) {
+	    				split = true;
+	    			} else if(JSON.stringify(hand) == JSON.stringify(['9', '9'])) {
+	    				if(dealer_card == '2' || dealer_card == '3' || dealer_card == '4' || dealer_card == '5' || dealer_card == '6' || dealer_card == '8' || dealer_card == '9'){
+	    					split = true;
+	    				}
+	    			} else if(JSON.stringify(hand) == JSON.stringify(['8', '8'])) {
+	    				split = true;
+	    			} else if(JSON.stringify(hand) == JSON.stringify(['7', '7'])) {
+	    				if(dealer_card == '2' || dealer_card == '3' || dealer_card == '4' || dealer_card == '5' || dealer_card == '6' || dealer_card == '7') {
+	    					split = true;
+	    				}
+	    			} else if(JSON.stringify(hand) == JSON.stringify(['6', '6'])) {
+	    				if(dealer_card == '3' || dealer_card == '4' || dealer_card == '5' || dealer_card == '6') {
+	    					split = true;
+	    				}
+	    			} else if(JSON.stringify(hand) == JSON.stringify(['3', '3'])) {
+	    				if(dealer_card == '4' || dealer_card == '5' || dealer_card == '6' || dealer_card == '7') {
+	    					split = true;
+	    				}
+	    			} else if(JSON.stringify(hand) == JSON.stringify(['2', '2'])) {
+	    				if(dealer_card == '5' || dealer_card == '6') {
+	    					split = true;
+	    				}
+	    			}
+
+	    			if(split != true) {
+	    				if(JSON.stringify(hand) == JSON.stringify(['ace', '9']) || JSON.stringify(hand) == JSON.stringify(['9', 'ace'])) {
+	    					stand = true;
+	    				} else if(JSON.stringify(hand) == JSON.stringify(['ace', '8']) || JSON.stringify(hand) == JSON.stringify(['8', 'ace'])) {
+	    					stand = true;
+	    				} else if(JSON.stringify(hand) == JSON.stringify(['ace', '7']) || JSON.stringify(hand) == JSON.stringify(['7', 'ace'])) {
+	    					if(dealer_card == '2' || dealer_card == '3' || dealer_card == '4' || dealer_card == '5'
+	    						|| dealer_card == '6' || dealer_card == '7' || dealer_card == '8') {
+	    						stand = true;
+	    					}
+	    				} else if(JSON.stringify(hand) == JSON.stringify(['ace', '6']) || JSON.stringify(hand) == JSON.stringify(['6', 'ace'])) {
+	    					hit = true;
+	    				} else if(JSON.stringify(hand) == JSON.stringify(['ace', '5']) || JSON.stringify(hand) == JSON.stringify(['5', 'ace'])) {
+	    					hit = true;
+	    				} else if(JSON.stringify(hand) == JSON.stringify(['ace', '4']) || JSON.stringify(hand) == JSON.stringify(['4', 'ace'])) {
+	    					hit = true;
+	    				} else if(JSON.stringify(hand) == JSON.stringify(['ace', '3']) || JSON.stringify(hand) == JSON.stringify(['3', 'ace'])) {
+	    					hit = true;
+	    				} else if(JSON.stringify(hand) == JSON.stringify(['ace', '6']) || JSON.stringify(hand) == JSON.stringify(['6', 'ace'])) {
+	    					hit = true;
+	    				}
+
+	    				if(stand == true) {
+	    					document.getElementById('result-text').innerHTML = "STAND";
+	    					document.getElementById('result-box').style = "display: block;";
+	    				} else if(hit == true) {
+	    					document.getElementById('result-text').innerHTML = "HIT";
+	    					document.getElementById('result-box').style = "display: block;";
+	    				} else {
+	    					if(sum > 21) {
+	    						bust = true;
+	    					} else if(sum >= 17) {
+	    						stand = true;
+	    					} else if(sum <= 16 && sum >= 13) {
+	    						if(dealer_card == '2' || dealer_card == '3' || dealer_card == '4' || dealer_card == '5' || dealer_card == '6'){
+	    							stand = true;
+	    						} else {
+	    							hit = true;
+	    						}
+	    					} else {
+	    						hit = true;
+	    					}
+
+	    					if(stand == true) {
+	    						document.getElementById('result-text').innerHTML = "STAND";
+	    						document.getElementById('result-box').style = "display: block;";
+	    					} else if(bust == true) {
+	    						document.getElementById('result-text').innerHTML = "BUSTED";
+	    						document.getElementById('result-box').style = "display:block;";
+	    					} else {
+	    						document.getElementById('result-text').innerHTML = "HIT";
+	    						document.getElementById('result-box').style = "display: block;";
+	    					}
+	    				}
+	    			} else {
+	    				document.getElementById('result-text').innerHTML = "SPLIT";
+	    				document.getElementById('result-box').style = "display: block;";
+	    			}
+	    		} else {
+	    			// window.alert(sum);
+	    			if(sum > 21) {
+						bust = true;
+					} else if(sum >= 17) {
+						stand = true;
+					} else if(sum <= 16 && sum >= 13) {
+						if(dealer_card == '2' || dealer_card == '3' || dealer_card == '4' || dealer_card == '5' || dealer_card == '6'){
+							stand = true;
+						} else {
+							hit = true;
+						}
+					} else {
+						hit = true;
+					}
+
+					if(stand == true) {
+						document.getElementById('result-text').innerHTML = "STAND";
+						document.getElementById('result-box').style = "display: block;";
+					} else if(bust == true) {
+						document.getElementById('result-text').innerHTML = "BUSTED";
+						document.getElementById('result-box').style = "display:block;";
+					} else {
+						document.getElementById('result-text').innerHTML = "HIT";
+						document.getElementById('result-box').style = "display: block;";
+					}
+	    		}
+    		}
+    	}
+
+    	function choose(card, person) {
+    		if(person == 'dealer') {
+    			dealer_card = card;
+    			if(dealer_card == 'ace') {
+    				document.getElementById('dealer-card-box').innerHTML = "<div class='dealer-card' id='dealer-card' style='display: none;'><img src='/static/img/cards/ace.jpg' style='margin: 5px; margin-top: 10px; width: 90%; height: 90%;'></div>";
+    			} else if(dealer_card == '2') {
+    				document.getElementById('dealer-card-box').innerHTML = "<div class='dealer-card' id='dealer-card' style='display: none;'><img src='/static/img/cards/2.jpg' style='margin: 5px; margin-top: 10px; width: 90%; height: 90%;'></div>";
+    			} else if(dealer_card == '3') {
+    				document.getElementById('dealer-card-box').innerHTML = "<div class='dealer-card' id='dealer-card' style='display: none;'><img src='/static/img/cards/3.jpg' style='margin: 5px; margin-top: 10px; width: 90%; height: 90%;'></div>";
+    			} else if(dealer_card == '4') {
+    				document.getElementById('dealer-card-box').innerHTML = "<div class='dealer-card' id='dealer-card' style='display: none;'><img src='/static/img/cards/4.jpg' style='margin: 5px; margin-top: 10px; width: 90%; height: 90%;'></div>";
+    			} else if(dealer_card == '5') {
+    				document.getElementById('dealer-card-box').innerHTML = "<div class='dealer-card' id='dealer-card' style='display: none;'><img src='/static/img/cards/5.jpg' style='margin: 5px; margin-top: 10px; width: 90%; height: 90%;'></div>";
+    			} else if(dealer_card == '6') {
+    				document.getElementById('dealer-card-box').innerHTML = "<div class='dealer-card' id='dealer-card' style='display: none;'><img src='/static/img/cards/6.jpg' style='margin: 5px; margin-top: 10px; width: 90%; height: 90%;'></div>";
+    			} else if(dealer_card == '7') {
+    				document.getElementById('dealer-card-box').innerHTML = "<div class='dealer-card' id='dealer-card' style='display: none;'><img src='/static/img/cards/7.jpg' style='margin: 5px; margin-top: 10px; width: 90%; height: 90%;'></div>";
+    			} else if(dealer_card == '8') {
+    				document.getElementById('dealer-card-box').innerHTML = "<div class='dealer-card' id='dealer-card' style='display: none;'><img src='/static/img/cards/8.jpg' style='margin: 5px; margin-top: 10px; width: 90%; height: 90%;'></div>";
+    			} else if(dealer_card == '9') {
+    				document.getElementById('dealer-card-box').innerHTML = "<div class='dealer-card' id='dealer-card' style='display: none;'><img src='/static/img/cards/9.jpg' style='margin: 5px; margin-top: 10px; width: 90%; height: 90%;'></div>";
+    			} else if(dealer_card == '10') {
+    				document.getElementById('dealer-card-box').innerHTML = "<div class='dealer-card' id='dealer-card' style='display: none;'><img src='/static/img/cards/10.jpg' style='margin: 5px; margin-top: 10px; width: 90%; height: 90%;'></div>";
+    			} else if(dealer_card == 'jack') {
+    				document.getElementById('dealer-card-box').innerHTML = "<div class='dealer-card' id='dealer-card' style='display: none;'><img src='/static/img/cards/jack.jpg' style='margin: 5px; margin-top: 10px; width: 90%; height: 90%;'></div>";
+    			} else if(dealer_card == 'queen') {
+    				document.getElementById('dealer-card-box').innerHTML = "<div class='dealer-card' id='dealer-card' style='display: none;'><img src='/static/img/cards/queen.jpg' style='margin: 5px; margin-top: 10px; width: 90%; height: 90%;'></div>";
+    			} else if(dealer_card == 'king') {
+    				document.getElementById('dealer-card-box').innerHTML = "<div class='dealer-card' id='dealer-card' style='display: none;'><img src='/static/img/cards/king.jpg' style='margin: 5px; margin-top: 10px; width: 90%; height: 90%;'></div>";
+    			}
+    			$("#dealer-card").fadeIn(1500);
+    		} else {
+    			var length = hand.length;
+    			var real_length = length + 1;
+    			player_card = card;
+    			var card_string;
+    			var card_id = "player_"+length;
+    			hand[length] = player_card;
+    			if(player_card == 'ace') {
+    				card_string = "<div class='player-card' id='"+card_id+"' style='display: none; float: left;'><img src='/static/img/cards/ace.jpg' style='margin: 5px; margin-top: 10px; width: 90%; height: 90%;'></div>";
+    				document.getElementById('player-card-box').innerHTML += card_string;
+    			} else if(player_card == '2') {
+    				card_string = "<div class='player-card' id='"+card_id+"' style='display: none; float: left;'><img src='/static/img/cards/2.jpg' style='margin: 5px; margin-top: 10px; width: 90%; height: 90%;'></div>";
+    				document.getElementById('player-card-box').innerHTML += card_string;
+    			} else if(player_card == '3') {
+    				card_string = "<div class='player-card' id='"+card_id+"' style='display: none; float: left;'><img src='/static/img/cards/3.jpg' style='margin: 5px; margin-top: 10px; width: 90%; height: 90%;'></div>";
+    				document.getElementById('player-card-box').innerHTML += card_string;
+    			} else if(player_card == '4') {
+    				card_string = "<div class='player-card' id='"+card_id+"' style='display: none; float: left;'><img src='/static/img/cards/4.jpg' style='margin: 5px; margin-top: 10px; width: 90%; height: 90%;'></div>";
+    				document.getElementById('player-card-box').innerHTML += card_string;
+    			} else if(player_card == '5') {
+    				card_string = "<div class='player-card' id='"+card_id+"' style='display: none; float: left;'><img src='/static/img/cards/5.jpg' style='margin: 5px; margin-top: 10px; width: 90%; height: 90%;'></div>";
+    				document.getElementById('player-card-box').innerHTML += card_string;
+    			} else if(player_card == '6') {
+    				card_string = "<div class='player-card' id='"+card_id+"' style='display: none; float: left;'><img src='/static/img/cards/6.jpg' style='margin: 5px; margin-top: 10px; width: 90%; height: 90%;'></div>";
+    				document.getElementById('player-card-box').innerHTML += card_string;
+    			} else if(player_card == '7') {
+    				card_string = "<div class='player-card' id='"+card_id+"' style='display: none; float: left;'><img src='/static/img/cards/7.jpg' style='margin: 5px; margin-top: 10px; width: 90%; height: 90%;'></div>";
+    				document.getElementById('player-card-box').innerHTML += card_string;
+    			} else if(player_card == '8') {
+    				card_string = "<div class='player-card' id='"+card_id+"' style='display: none; float: left;'><img src='/static/img/cards/8.jpg' style='margin: 5px; margin-top: 10px; width: 90%; height: 90%;'></div>";
+    				document.getElementById('player-card-box').innerHTML += card_string;
+    			} else if(player_card == '9') {
+    				card_string = "<div class='player-card' id='"+card_id+"' style='display: none; float: left;'><img src='/static/img/cards/9.jpg' style='margin: 5px; margin-top: 10px; width: 90%; height: 90%;'></div>";
+    				document.getElementById('player-card-box').innerHTML += card_string;
+    			} else if(player_card == '10') {
+    				card_string = "<div class='player-card' id='"+card_id+"' style='display: none; float: left;'><img src='/static/img/cards/10.jpg' style='margin: 5px; margin-top: 10px; width: 90%; height: 90%;'></div>";
+    				document.getElementById('player-card-box').innerHTML += card_string;
+    			} else if(player_card == 'jack') {
+    				card_string = "<div class='player-card' id='"+card_id+"' style='display: none; float: left;'><img src='/static/img/cards/jack.jpg' style='margin: 5px; margin-top: 10px; width: 90%; height: 90%;'></div>";
+    				document.getElementById('player-card-box').innerHTML += card_string;
+    			} else if(player_card == 'queen') {
+    				card_string = "<div class='player-card' id='"+card_id+"' style='display: none; float: left;'><img src='/static/img/cards/queen.jpg' style='margin: 5px; margin-top: 10px; width: 90%; height: 90%;'></div>";
+    				document.getElementById('player-card-box').innerHTML += card_string;
+    			} else if(player_card == 'king') {
+    				card_string = "<div class='player-card' id='"+card_id+"' style='display: none; float: left;'><img src='/static/img/cards/king.jpg' style='margin: 5px; margin-top: 10px; width: 90%; height: 90%;'></div>";
+    				document.getElementById('player-card-box').innerHTML += card_string;
+    			}
+    			$("#"+card_id+"").fadeIn(1000);
+    		}
+    	}
+
+    	function hideResult() {
+    		document.getElementById('result-box').style="display: none;";
+    	}
+    </script>
+</head>
+<body>
+    <div class="bs-example">
+        <nav class="navbar navbar-expand-md navbar-custom" id="motivation-nav-bar">
+            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <div class="navbar-nav">
+                    <a href="welcome" class="nav-item nav-link">Home</a>
+                    <a href="members" class="nav-item nav-link">Members</a>
+                    <a href="motivation" class="nav-item nav-link">Motivation</a>
+                    <a href="odds" class="nav-item nav-link active">Start Odds</a>
+                </div>
+                <div class="navbar-nav ml-auto">
+                    <a href="login" class="nav-item nav-link">Login</a>
+                </div>
+            </div>
+        </nav>
+    	<div class="dealer-label" style="display: inline-block;">
+    		<h1 align="center" style="color:white; text-shadow: 2px 4px 3px rgba(0,0,0,0.3);">DEALER</h1>
+    	</div>
+    	<div class="dropdown show" style="display: inline-block;">
+    		<a class="btn btn-secondary dropdown-toggle" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="justify-content: right;">
+    			Select a card
+    		</a>
+        	<div class="dropdown-menu" id="dealer-card-selector" aria-labelledby="dropdownMenuLink">
+        		<a class="dropdown-item" onclick="choose('ace', 'dealer');">Ace</a>
+        		<a class="dropdown-item" onclick="choose('2', 'dealer');">2</a>
+        		<a class="dropdown-item" onclick="choose('3', 'dealer');">3</a>
+        		<a class="dropdown-item" onclick="choose('4', 'dealer');">4</a>
+        		<a class="dropdown-item" onclick="choose('5', 'dealer');">5</a>
+        		<a class="dropdown-item" onclick="choose('6', 'dealer');">6</a>
+        		<a class="dropdown-item" onclick="choose('7', 'dealer');">7</a>
+        		<a class="dropdown-item" onclick="choose('8', 'dealer');">8</a>
+        		<a class="dropdown-item" onclick="choose('9', 'dealer');">9</a>
+        		<a class="dropdown-item" onclick="choose('10', 'dealer');">10</a>
+        		<a class="dropdown-item" onclick="choose('jack', 'dealer');">Jack</a>
+        		<a class="dropdown-item" onclick="choose('queen', 'dealer');">Queen</a>
+        		<a class="dropdown-item" onclick="choose('king', 'dealer');">King</a>
+        	</div>
+    	</div>
+    	<div class="card-box" id="dealer-card-box">
+    		
+    	</div>
+        <div class="player-label" style="display: inline-block;">
+        	<h1 align="center" style="color:white; text-shadow: 2px 4px 3px rgba(0,0,0,0.3);">PLAYER</h1>
+        </div>
+        <div class="dropdown show" style="display: inline-block;">
+    		<a class="btn btn-secondary dropdown-toggle" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="justify-content: right;">
+    			Select a card
+    		</a>
+        	<div class="dropdown-menu" id="dealer-card-selector" aria-labelledby="dropdownMenuLink">
+        		<a class="dropdown-item" onclick="choose('ace', 'player');">Ace</a>
+        		<a class="dropdown-item" onclick="choose('2', 'player');">2</a>
+        		<a class="dropdown-item" onclick="choose('3', 'player');">3</a>
+        		<a class="dropdown-item" onclick="choose('4', 'player');">4</a>
+        		<a class="dropdown-item" onclick="choose('5', 'player');">5</a>
+        		<a class="dropdown-item" onclick="choose('6', 'player');">6</a>
+        		<a class="dropdown-item" onclick="choose('7', 'player');">7</a>
+        		<a class="dropdown-item" onclick="choose('8', 'player');">8</a>
+        		<a class="dropdown-item" onclick="choose('9', 'player');">9</a>
+        		<a class="dropdown-item" onclick="choose('10', 'player');">10</a>
+        		<a class="dropdown-item" onclick="choose('jack', 'player');">Jack</a>
+        		<a class="dropdown-item" onclick="choose('queen', 'player');">Queen</a>
+        		<a class="dropdown-item" onclick="choose('king', 'player');">King</a>
+        	</div>
+    	</div>
+    	<div class="card-box" id="player-card-box">
+    		<div class="player-card" style="display: none;"></div>
+    	</div>
+        <div class="action-button-container" align="center">
+        	<div class="action-button" onclick="submit_window();" style="cursor: pointer;">
+        		<h1 align="center" style="color:white; text-shadow: 2px 4px 3px rgba(0,0,0,0.3);">CALCULATE</h1>
+        	</div>
+        	<div class="action-button" onclick="reset_window();" style="cursor: pointer;">
+        		<h1 align="center" style="color:white; text-shadow: 2px 4px 3px rgba(0,0,0,0.3);">RESET</h1>
+        	</div>
+        </div>
+    </div>
+    <div class="result" align="center" style="display: none;" id="result-box" onclick="hideResult();">
+    	<h1 style="margin-top: 200px;" id="result-text">RESULT</h1>
+    </div>
+</body>
+</html>

@@ -1,0 +1,97 @@
+.bs-example{
+    margin: 20px;
+}
+
+/* Three columns side by side */
+.column {
+float: left;
+width: 33%;
+margin-bottom: 16px;
+padding: 0 8px;
+color: black;
+}
+
+/* Display the columns below each other instead of side by side on small screens */
+@media screen and (max-width: 650px) {
+.column {
+    width: 100%;
+    display: block;
+}
+}
+
+/* Add some shadows to create a card effect */
+.card {
+box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+width: 300px;
+height: 500px;
+}
+
+/* Some left and right padding inside the container */
+.container {
+padding: 0 16px;
+}
+
+/* Clear floats */
+.container::after, .row::after {
+content: "";
+clear: both;
+display: table;
+}
+
+.title {
+color:black;
+}
+
+/* Button code */
+.button {
+border: none;
+outline: 0;
+display: inline-block;
+padding: 8px;
+color: white;
+background-color: #000;
+text-align: center;
+cursor: pointer;
+width: 100%;
+}
+
+.button:hover {
+background-color: #555;
+}
+
+body{
+    background-image: url('/static/img/bigstock-poker-table-background.jpg');
+    background-size: cover;
+}
+
+.bs-example{
+    margin: 20px;
+}
+
+.navbar-custom {
+    background-image: url('/static/img/wood-background.jpg');
+    background-size: 100% 500%;
+}
+
+a {
+    color: white;
+    text-shadow: 2px 4px 3px rgba(0,0,0,0.3);
+}
+
+a:hover {
+    color: #D3D3D3;
+    text-shadow: 2px 4px 3px rgba(0,0,0,0.3);
+}
+
+a.active {
+    color: #A9A9A9;
+    text-shadow: 2px 4px 3px rgba(0,0,0,0.3);
+}
+
+#motivation-jumbotron {
+    background-image: url('/static/img/wood-background.jpg');
+    background-size: contain;
+    color: white;
+    text-shadow: 2px 4px 3px rgba(0,0,0,0.3);
+    margin: 20px;
+}
